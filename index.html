@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HerFlow</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      line-height: 1.5;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 12px;
+      font-size: 16px;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+    }
+    button {
+      padding: 12px 18px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #output {
+      margin-top: 20px;
+      padding: 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>HerFlow</h1>
+  <p>Skriv hvordan du har det, og tryk send.</p>
+
+  <textarea id="input" placeholder="Jeg føler mig lidt træt i dag..."></textarea>
+  <br />
+  <button onclick="sendMessage()">Send</button>
+
+  <div id="output">Svar kommer her...</div>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("input").value;
+      const output = document.getElementById("output");
+
+      if (!input.trim()) {
+        output.innerText = "Skriv lige en besked først.";
+        return;
+      }
+
+      output.innerText = "Tænker...";
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: input
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.reply) {
+          output.innerText = data.reply;
+        } else if (data.error) {
+          output.innerText = "Fejl: " + data.error;
+        } else {
+          output.innerText = "Noget gik galt.";
+        }
+      } catch (err) {
+        output.innerText = "Kunne ikke kontakte serveren.";
+      }
+    }
+  </script>
+</body>
+</html>
