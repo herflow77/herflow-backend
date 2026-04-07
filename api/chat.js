@@ -6,7 +6,7 @@ const client = new OpenAI({
 
 function setCors(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 }
 
@@ -17,12 +17,16 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Kun POST er tilladt" });
-  }
-
   try {
-    const userMessage = req.body?.message || "";
+    let userMessage = "";
+
+    if (req.method === "GET") {
+      userMessage = req.query?.message || "";
+    } else if (req.method === "POST") {
+      userMessage = req.body?.message || "";
+    } else {
+      return res.status(405).json({ error: "Kun GET og POST er tilladt" });
+    }
 
     if (!userMessage.trim()) {
       return res.status(400).json({ error: "Ingen besked modtaget" });
