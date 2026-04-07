@@ -15,3 +15,7 @@ async function sendMessage() {
 
   document.getElementById("output").innerText = data.reply;
 }
+<input id="input" placeholder="Skriv noget..." />
+<button onclick="sendMessage()">Send</button>
+
+<p id="output"></p>
